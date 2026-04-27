@@ -102,7 +102,7 @@
             "Rabbit"
         ],
         [
-            "とりにく",
+            "チキン",
             "Chicken"
         ],
         [
@@ -238,13 +238,13 @@
     function stat() {
         let secondPer = 15;
         let prepost = 15;
-        console.log(japanese.length + " words are on this game. If one question is completed every 15 seconds, there is an about " + (Math.floor(((420/15)/japanese.length)*100) + "% chance each word gets assessed"));
+        console.log(japanese.length + " words are on this game. If one question is completed every 15 seconds, there is an about " + (Math.floor(((420/15)/japanese.length)*100) + "% chance each word gets quizzed in the game"));
         console.log(Math.floor((prepost/japanese.length)*100) + "% is tested on pre-post")
     }
 
     let timerMode = $state(0);
     let timer = $state(420); // 7 minutes (60*7)
-    let timerString = $state("");
+    let timerString = $state(convertTimerString());
 
     let timerBreak;
     /*
@@ -355,6 +355,9 @@
             color: rgb(92, 49, 49);
             transform: scale(1);
         }
+        button.pauseMode {
+            transform: scale(1);
+        }
     }
 
     button.pause {
@@ -409,9 +412,9 @@
             <div id="choices">
                 {#each round.choices as x}
                     {#if x == round.corr}
-                    <button class:correct={answerStatus == 1} disabled={answerStatus == 1 || timerMode == 0} onclick={() => {progress(true)}}>{x}</button>
+                    <button class:pauseMode={!timerMode} class:correct={answerStatus == 1} disabled={answerStatus == 1 || timerMode == 0} onclick={() => {progress(true)}}>{x}</button>
                     {:else}
-                    <button class:incorrect={answerStatus == 1} disabled={answerStatus == 1 || timerMode == 0} onclick={() => {progress(false)}}>{x}</button>
+                    <button class:pauseMode={!timerMode} class:incorrect={answerStatus == 1} disabled={answerStatus == 1 || timerMode == 0} onclick={() => {progress(false)}}>{x}</button>
                     {/if}
                 {/each}
             </div>
