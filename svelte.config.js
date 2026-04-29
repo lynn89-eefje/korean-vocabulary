@@ -7,7 +7,7 @@ const config = {
 			fallback: '404.html'
 		}),
 		paths: {
-			base: '/japanese-vocabulary'
+			base: '/korean-vocabulary'
 		}
 	}
 };

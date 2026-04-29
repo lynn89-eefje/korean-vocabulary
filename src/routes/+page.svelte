@@ -2,153 +2,135 @@
     import { base } from "$app/paths";
     import { fade, fly, slide } from "svelte/transition";
     import { onMount } from "svelte";
+    import { confetti } from '@neoconfetti/svelte';
     //import { passive } from "svelte/legacy"; <- This autoimported and I'm not sure why
 
-    let japanese = [
+    let korean = [
         [
-            "あか",
+            "빨간색",
             "Red"
         ],
         [
-            "あお",
+            "파란색",
             "Blue"
         ],
         [
-            "しろ",
-            "White"
-        ],
-        [
-            "くろ",
-            "Black"
-        ],
-        [ 
-            "こんにちは",
-            "Hello"
-        ],
-        [
-            "くがつ",
-            "September"
-        ],
-        [
-            "じゅうがつ",
-            "October"
-        ],
-        [
-            "フラワー",
-            "Flower"
-        ],
-        [
-            "ピンク",
+            "분홍색",
             "Pink"
         ],
         [
-            "ナイト",
-            "Knight"
+            "검은색",
+            "Black"
         ],
         [
-            "キノコ",
-            "Mushroom"
+            "하얀색",
+            "White"
         ],
         [
-            "川",
-            "River"
-        ],
-        [
-            "ジュース",
-            "Juice"
-        ],
-        [
-            "マウンテン",
-            "Mountain"
-        ],
-        [
-            "オーシャン", 
-            "Ocean"
-        ],
-        [
-            "火",
-            "Fire"
-        ],
-        [
-            "木",
-            "Tree"
-        ],
-        [
-            "マネー",
-            "Money"
-        ],
-        [
-            "ミルク",
-            "Milk"
-        ],
-        [
-            "ちいさい",
-            "Small"
-        ],
-        [
-            "むずかしい",
-            "Difficult"
-        ],
-        [
-            "犬",
-            "Dog"
-        ],
-        [
-            "くま",
+            "곰",
             "Bear"
         ],
         [
-            "ウサギ",
+            "새",
+            "Bird"
+        ],
+        [
+            "상표",
+            "Sticker"
+        ],
+        [
+            "우유",
+            "Milk"
+        ],
+        [
+            "토끼",
             "Rabbit"
         ],
         [
-            "チキン",
-            "Chicken"
+            "버섯",
+            "Mushroom"
         ],
         [
-            "刀",
-            "Sword"
+            "대양",
+            "Ocean"
         ],
         [
-            "フクロウ",
+            "늘",
+            "Always"
+        ],
+        [
+            "강",
+            "River"
+        ],
+        [
+            "꽃",
+            "Flower"
+        ],
+        [
+            "물고기",
+            "Fish"
+        ],
+        [
+            "불",
+            "Fire"
+        ],
+        [
+            "벨",
+            "Bell"
+        ],
+        [
+            "모자",
+            "Hat"
+        ],
+        [
+            "사과",
+            "Apple"
+        ],
+        [
+            "배",
+            "Pear"
+        ],
+        [
+            "망고",
+            "Mango"
+        ],
+        [
+            "주스",
+            "Juice"
+        ],
+        [
+            "올빼미",
             "Owl"
         ],
         [
-            "石",
-            "Rock"
+            "달",
+            "Moon"
         ],
         [
-            "本",
-            "Book"
+            "밤",
+            "Night"
         ],
         [
-            "友人",
-            "Friend"
+            "시계",
+            "Clock"
         ],
         [
-            "日本",
-            "Japan"
+            "컴퓨터",
+            "Computer"
         ],
         [
-            "ライオン",
-            "Lion"
+            "자전거",
+            "Bicycle"
         ],
         [
-            "ペンギン",
-            "Penguin"
-        ],
-        [
-            "カレンダー",
-            "Calendar"
-        ],
-        [
-            "ライブラリ",
-            "Library"
+            "한국인",
+            "Korean"
         ]
     ]
 
+
     let assessed = [];
-    for (let i = 0;  i < japanese.length; i++) {
+    for (let i = 0;  i < korean.length; i++) {
         assessed.push(i);
     }
 
@@ -163,7 +145,7 @@
 
     function generateRound() {
         if (assessed.length == 0) {
-            for (let i = 0;  i < japanese.length; i++) {
+            for (let i = 0;  i < korean.length; i++) {
                 assessed.push(i);
             }
         }
@@ -171,8 +153,8 @@
         let rand = Math.floor((Math.random() * assessed.length));
         rand = assessed[rand];
         assessed = assessed.filter((index) => index != rand);
-        round.curr = japanese[rand][0];
-        round.corr = japanese[rand][1];
+        round.curr = korean[rand][0];
+        round.corr = korean[rand][1];
 
         let corrIndex = Math.floor(Math.random() * 4);
         for (let i = 0; i < 4; i++) {
@@ -180,13 +162,13 @@
                 round.choices.push(round.corr);
             }
             else {
-                let rand2 = Math.floor((Math.random() * japanese.length));
+                let rand2 = Math.floor((Math.random() * korean.length));
                 if (rand2 == rand) {
                     i--;
                     continue;
                 }
-                else if (checkChoices(japanese[rand2][1])) {
-                    round.choices.push(japanese[rand2][1]);
+                else if (checkChoices(korean[rand2][1])) {
+                    round.choices.push(korean[rand2][1]);
                 }
                 else {
                     i--; 
@@ -210,8 +192,8 @@
     function progress (correct) {
         setTimeout(function() {answerStatus = 1}, 500);
         if (correct) {
-            setTimeout(function() {streak++; correctAnswers++}, 500);
-            setTimeout(()=> {if (gameStatus != 3) {answerStatus = 0; gameStatus = 2; generateRound()}}, 2500);
+            setTimeout(function() {streak++; correctAnswers++;}, 500);
+            setTimeout(()=> {if (gameStatus != 3) {answerStatus = 0; gameStatus = 2; generateRound();}}, 2500);
             setTimeout(function() {if (gameStatus != 3) {gameStatus = 1}}, 3000);
             setTimeout(function() {
                 if (streak > maxStreak) {
@@ -238,12 +220,12 @@
     function stat() {
         let secondPer = 15;
         let prepost = 15;
-        console.log(japanese.length + " words are on this game. If one question is completed every 15 seconds, there is an about " + (Math.floor(((420/15)/japanese.length)*100) + "% chance each word gets quizzed in the game"));
-        console.log(Math.floor((prepost/japanese.length)*100) + "% is tested on pre-post")
+        console.log(korean.length + " words are on this game. If one question is completed every 15 seconds, there is an about " + (Math.floor(((420/15)/korean.length)*100) + "% chance each word gets quizzed in the game"));
+        console.log(Math.floor((prepost/korean.length)*100) + "% is tested on pre-post")
     }
 
     let timerMode = $state(0);
-    let timer = $state(420); // 7 minutes (60*7)
+    let timer = $state(420); // 7 minutes (60*7) > Set to 420
     let timerString = $state(convertTimerString());
 
     let timerBreak;
@@ -252,6 +234,7 @@
         timerBreak = window.setInterval(timerCount, 1000);
     })
     */
+   let triggerConfetti = $state(false);
     function timerCount() {
         if (timerMode == 1) {
             timerString = convertTimerString();
@@ -264,6 +247,9 @@
             correctEmote = 1;
             console.log(totalQuestions + " questions completed");
             window.clearInterval(timerBreak);
+            if (correctAnswers > 0) {
+                window.setTimeout(() => {triggerConfetti = true}, 1500);
+            }
         }
     }
     function convertTimerString() {
@@ -287,7 +273,7 @@
 <svelte:head>
     <link rel="preload" as="image" href="{base}/images/imke.png"/>
     <link rel="preload" as="image" href="{base}/images/imkeAngry.png"/>
-    <title>Japanese Vocabulary Game</title>
+    <title>Korean Vocabulary Game</title>
 </svelte:head>
 <style>
     #container {
@@ -312,8 +298,8 @@
         position: fixed;
         transform: translate(-50%, 0%);
         left: 50%;
-        bottom: -100px;
-        animation: pulse 3s infinite ease-in-out;
+        bottom: -110px;
+        animation: pulse 2s infinite ease-in-out;
         
         img {
             max-width: 300px;
@@ -322,7 +308,7 @@
     }
     @keyframes pulse {
         0%, 100% {
-            bottom: -100px;
+            bottom: -110px;
         }
         50% {
             bottom: -120px;
@@ -385,6 +371,15 @@
             }
         }
     }
+
+    .confetti {
+        position: fixed;
+        top: 10%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+        z-index: 999;
+    }
 </style>
 {#if gameStatus == 1 || gameStatus == 2}
 <div id="streak" in:slide={{delay: 700}} out:slide>
@@ -400,14 +395,14 @@
     <div style:margin-top=20px>
         {#if gameStatus == 0}
         <div out:fade style:margin-top=60px>
-            <h1>Japanese Vocabulary Game</h1>
-            <p>Let's learn Japanese! Don't get questions wrong, or the bird gets angry...</p>
+            <h1>Korean Vocabulary Game</h1>
+            <p>Let's learn Korean! Don't get questions wrong, or the bird gets angry...</p>
             <p><button onclick={function() {gameStatus = 0.5; setTimeout(() => {timerBreak = window.setInterval(timerCount, 1000); gameStatus = 1; timerMode = 1}, 500)}}>Start</button></p>
         </div>
         {/if}
         {#if gameStatus == 1}
         <div style:text-align="center" in:fly={{delay: 1000, y:100}} out:fade>
-            <h1 translate="no" style:user-select="none">{round.curr}</h1>
+            <h1 translate="no" style:user-select="none" style:font-size=40px>{round.curr}</h1>
             <h2 style:color="white">Translate this word into its English equivalent</h2>
             <div id="choices">
                 {#each round.choices as x}
@@ -437,6 +432,10 @@
         {/if}
     </div>
 </div>
+
+{#if triggerConfetti == true}
+<div class="confetti" use:confetti></div>
+{/if}
 
 <div id="bird">
     {#if correctEmote}
