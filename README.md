@@ -1,33 +1,12 @@
-# sv
+# Korean Vocabulary
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+This is a Korean vocablary game being used as a study tool. Each round lasts 7 minutes and participants attempt to retain and revise upon as many words as possible. This tool is being used across multiple sessions.
 
-## Creating a project
+This game can be accessed at hacklyn.city/korean-vocabulary and used on desktop devices. Keyboard and/or mouse are required.
 
-If you're seeing this, you've probably already done this step. Congrats!
+## How this project was built
 
-```sh
-# create a new project
-npx sv create my-app
-```
-
-To recreate this project with the same configuration:
-
-```sh
-# recreate this project
-npx sv@0.15.1 create --template minimal --no-types --add sveltekit-adapter="adapter:static" --install npm ./
-```
-
-## Developing
-
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
-
-```sh
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
+This was built using the SvelteKit framework
 
 ## Building
 
