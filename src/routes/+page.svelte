@@ -3,7 +3,11 @@
     import { fade, fly, slide } from "svelte/transition";
     import { onMount } from "svelte";
     import { confetti } from '@neoconfetti/svelte';
+    import { page } from "$app/state";
     //import { passive } from "svelte/legacy"; <- This autoimported and I'm not sure why
+
+    let screenX = $state(1000);
+    let screenY = $state(700);
 
     let korean = [
         [
@@ -143,6 +147,12 @@
         "choices": []
     });
 
+    let mobileChoices = $derived(
+        round.choices.length == 4 
+            ? [[round.choices[0], round.choices[1]], [round.choices[2], round.choices[3]]] 
+            : []
+    );
+
     function generateRound() {
         if (assessed.length == 0) {
             for (let i = 0;  i < korean.length; i++) {
@@ -242,6 +252,9 @@
             timer--;
         }
         if (timer < -1) {
+            generateLog("Game ended");
+            generateLog(`${totalQuestions} total questions and ${correctAnswers} correct answers`);
+            console.log(gameLog);
             timerMode = 0;
             gameStatus = 3;
             correctEmote = 1;
@@ -266,6 +279,23 @@
     let streak = $state(0);
     let maxStreak = $state(0);
 
+    let gameLog = $state([]);
+    function generateLog(action) {
+        let time = new Date();
+        let epoch = time.getTime();
+
+        gameLog.push({
+            "time": epoch,
+            "timeString": time.toString(),
+            "log": action
+        });
+    }
+    generateLog("Opened game");
+
+    async function studyNext() {
+        await navigator.clipboard.writeText(JSON.stringify(gameLog));
+    }
+
     // Testing
     let totalQuestions = $state(0);
 
@@ -289,9 +319,17 @@
         width: 90%;
         height: 78.5%;
         z-index: 999;
+        
+        @media screen and (max-width: 800px) {
+            width: 80%;
+        }
     }
     #container.active {
         top: 53.5%;
+
+        @media screen and (max-width: 800px) {
+            top: 60%;
+        }
     }
     #bird {
         z-index: 1000;
@@ -300,11 +338,15 @@
         left: 50%;
         bottom: -110px;
         animation: pulse 2s infinite ease-in-out;
+        @media screen and (max-width: 800px) {
+            animation: pulseLower 2s infinite ease-in-out;
+        }
         
         img {
             max-width: 280px;
             transition: transform 0.3s ease-in-out;
         }
+
     }
     @keyframes pulse {
         0%, 100% {
@@ -312,6 +354,15 @@
         }
         50% {
             bottom: -115px;
+        }
+    }
+
+    @keyframes pulseLower {
+        0%, 100% {
+            bottom: -145px;
+        }
+        50% {
+            bottom: -155px;
         }
     }
 
@@ -344,6 +395,10 @@
         button.pauseMode {
             transform: scale(1);
         }
+
+        @media screen and (max-width: 800px) {
+            display: block;
+        }
     }
 
     button.pause {
@@ -370,6 +425,9 @@
                 transform: translateY(3.5px);
             }
         }
+        @media screen and (max-width: 800px) {
+            top: 4%;
+        }
     }
 
     .confetti {
@@ -381,6 +439,7 @@
         z-index: 999;
     }
 </style>
+<svelte:window bind:innerWidth={screenX} bind:innerHeight={screenY}></svelte:window>
 {#if gameStatus == 1 || gameStatus == 2}
 <div id="streak" in:slide={{delay: 700}} out:slide>
     <h3><span class="material-symbols-outlined">check_circle</span> {correctAnswers} <span class="material-symbols-outlined" translate="no">mode_heat</span> {streak}</h3>
@@ -389,15 +448,15 @@
 <div id="container" class:active={gameStatus == 1 || gameStatus == 2}>
     {#if gameStatus == 1 || gameStatus == 2}
     <div style:margin-top=5px in:fade={{delay: 500}} out:fade>
-        <p style:font-weight=800>{timerString} <button class="pause" onclick={() => {if (timerMode == 1) { timerMode = 0} else {timerMode = 1}}}><span class="material-symbols-outlined" translate="no">{#if timerMode}pause_circle{:else}play_circle{/if}</span></button></p>
+        <p style:font-weight=800>{timerString} <button class="pause" onclick={() => {if (timerMode == 1) { timerMode = 0; generateLog("Pause")} else {timerMode = 1; generateLog("Unpause")}}}><span class="material-symbols-outlined" translate="no">{#if timerMode}pause_circle{:else}play_circle{/if}</span></button></p>
     </div>
     {/if}
     <div style:margin-top=20px>
         {#if gameStatus == 0}
         <div out:fade style:margin-top=60px>
             <h1>Korean Vocabulary Game</h1>
-            <p>Let's learn Korean! Don't get questions wrong, or the bird gets angry...</p>
-            <p><button onclick={function() {gameStatus = 0.5; setTimeout(() => {timerBreak = window.setInterval(timerCount, 1000); gameStatus = 1; timerMode = 1}, 500)}}>Start</button></p>
+            <p>Let's learn Korean!</p>
+            <p><button onclick={function() {gameStatus = 0.5; setTimeout(() => {timerBreak = window.setInterval(timerCount, 1000); gameStatus = 1; timerMode = 1; generateLog("Start game")}, 500)}}>Start</button></p>
         </div>
         {/if}
         {#if gameStatus == 1}
@@ -405,13 +464,25 @@
             <h1 translate="no" style:user-select="none" style:font-size=40px>{round.curr}</h1>
             <h2 style:color="white">Translate this word into its English equivalent</h2>
             <div id="choices">
+                {#if screenX > 800}
                 {#each round.choices as x}
                     {#if x == round.corr}
-                    <button class:pauseMode={!timerMode} class:correct={answerStatus == 1} disabled={answerStatus == 1 || timerMode == 0} onclick={() => {progress(true)}}>{x}</button>
+                    <button class:pauseMode={!timerMode} class:correct={answerStatus == 1} disabled={answerStatus == 1 || timerMode == 0} onclick={() => {progress(true); generateLog(`Answered correctly: ${x}`)}}>{x}</button>
                     {:else}
-                    <button class:pauseMode={!timerMode} class:incorrect={answerStatus == 1} disabled={answerStatus == 1 || timerMode == 0} onclick={() => {progress(false)}}>{x}</button>
+                    <button class:pauseMode={!timerMode} class:incorrect={answerStatus == 1} disabled={answerStatus == 1 || timerMode == 0} onclick={() => {progress(false); generateLog(`Answered incorrectly: ${x} instead of ${round.corr}`)}}>{x}</button>
                     {/if}
                 {/each}
+                {:else}
+                {#each mobileChoices as k}
+                    {#each k as x}
+                        {#if x == round.corr}
+                        <button class:pauseMode={!timerMode} class:correct={answerStatus == 1} disabled={answerStatus == 1 || timerMode == 0} onclick={() => {progress(true); generateLog(`Answered correctly: ${x}`)}}>{x}</button>
+                        {:else}
+                        <button class:pauseMode={!timerMode} class:incorrect={answerStatus == 1} disabled={answerStatus == 1 || timerMode == 0} onclick={() => {progress(false); generateLog(`Answered incorrectly: ${x} instead of ${round.corr}`)}}>{x}</button>
+                        {/if}
+                    {/each}
+                {/each}
+                {/if}
             </div>
         </div>
         {/if}
@@ -428,6 +499,8 @@
             {:else}
             <p>{correctAnswers} correct answer <span class="material-symbols-outlined" style:transform="translateY(8px)">check_circle</span></p>
             {/if}
+            <p><button onclick={studyNext}>Log and Continue</button></p>
+
         </div>
         {/if}
     </div>
@@ -437,10 +510,12 @@
 <div class="confetti" use:confetti></div>
 {/if}
 
-<div id="bird">
+{#if screenY >= 700 || [1, 2].indexOf(gameStatus) == -1}
+<div id="bird" transition:fade>
     {#if correctEmote}
     <img src="{base}/images/imke.png" alt="Bird"/>
     {:else}
     <img src="{base}/images/imkeAngry.png" alt="Bird"/>
     {/if}
 </div>
+{/if}
